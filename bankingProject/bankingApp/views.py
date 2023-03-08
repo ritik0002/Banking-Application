@@ -66,7 +66,7 @@ def transaction_api(request):
 
         encrypted_data=HE.encryptInt(val)
         decrypted_data =HE.decryptInt(encrypted_data)[0]
-        decrypted_data=decrypted_data
+        decrypted_data=decrypted_data/100
     
         
         return JsonResponse({
