@@ -1,20 +1,36 @@
 <template>
+
     <div>
-    <h1>Home Page</h1>
+        Balance: {{ balance }}
+        id:{{id}}
+    </div>
+    <div>
+    <h1>Deposit</h1>
     <form @submit.prevent="saveNewObject">
-      <input type="text" v-model="inputData"/>
+      <input type="Number" step="0.01" v-model="inputData"/>
       <button type="submit">Send to Backend</button>
     </form>
     <p>Encrypted Data: {{ encryptedData }}</p>
 
 
     <div>
-       <h1>Test</h1>
+       <h1>Display Transactions</h1>
         <h2>Fetch Transactions:</h2>
         {{this.Transactions}}
         <h3>Post Transaction</h3>
         <button @click="saveNewObject">Click me to POST</button>
     </div>
+    </div>
+
+
+    <div>
+        <h1>Account Information</h1>
+        <h2>Withdraw Money</h2>
+        <form @submit.prevent="saveWithdraw">
+            <input type="text" v-model="amount"/>
+            <div><button type="submit">Submit</button></div>
+        </form>
+
     </div>
 </template>
 
@@ -39,29 +55,47 @@ function getCookie(name){
         data() {
             return{
                 encryptedData:'',
-                inputData:'',
+                inputData:null,
+                amount:null,
                 Transactions:[],
+                balance:null,
+                id:null,
+
             }
         },
         
         methods: {
+        
+        async fetch_Balance(){
+            let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data1=await response1.json();
+            this.id=data1.User.id   //gets current user id
+            let response = await fetch("http://localhost:8000/api/users/"+this.id+"/");
+            //turn the data into json and fetches the data from the backend
+            let data = await response.json();
+            //retrieve list of transport objects
+            this.balance = data.user.balance;
+        },
         async fetch_Transactions() {
             //ajax request to perform list recipes
-            let response = await fetch("http://localhost:8000/api/test/");
+            let response = await fetch("http://localhost:8000/api/transaction/");
             //turn the data into json and fetches the data from the backend
             let data = await response.json();
             //retrieve list of transport objects
             this.Transactions = data.Transaction;
         },
+        // async saveWithdraw(){
+        //     pass
+
+        // },
         async saveNewObject() {
-           
             const Transaction = JSON.stringify({
-                amount:150,
-                type: "w",
+                amount:parseFloat(this.inputData).toFixed(2),
+                type: "D",
                 date: "2025-06-07",
             })
-            if (this.id == null) {
-                let response = await fetch("http://127.0.0.1:8000/api/test/", {
+            
+                let response = await fetch("http://127.0.0.1:8000/api/transaction/", {
                     method: 'POST',
                     credentials: "include",
                     mode: "cors",
@@ -71,8 +105,9 @@ function getCookie(name){
                     },
                     body: Transaction,
                 })
-            }
+            
         },
+
         async getSession(){
             let response = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
             let data = await response.json();
@@ -82,9 +117,10 @@ function getCookie(name){
         },
     },
     mounted(){
+        this.fetch_Balance();
         this.getSession();
         // this.fetch_user();
-        this.fetch_Transactions();
+        // this.fetch_Transactions();
     },
 }
 </script>

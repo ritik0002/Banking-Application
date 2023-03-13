@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import *
 import numpy as np
 from Pyfhel import Pyfhel
-
+import pickle
 
 
 def sessionUser(request):
@@ -29,28 +29,53 @@ def sessionUser(request):
 
     return HttpResponse("")
 
-def users_api(request):
-    """API handling all users. GET request returns JSON of all objects. POST request adds new user record and returns it."""
-    # if request.method == 'GET':
-    #     return JsonResponse({
-    #         'user': [
-    #             user.to_dict()
-    #             for user in User.objects.all()
-    #         ]
-    #     })
+
+def users_api(request,userID):
+    """API handling user balance. Fetches the balance and decrypts it."""
+    if request.method == 'GET':        
+        user=get_object_or_404(User,id=userID)
+        if len(user.balance)==0:
+            return JsonResponse({
+            'user':{ 
+                'balance':0
+            }
+        })
+        else:
+            # bytes_obj = user.balance.encode('utf-8')
+            temp=pickle.loads(user.balance)  #turn the byte string back into object
+            temp=decrypt_data(temp)[0]/100
+            return JsonResponse({
+                'user':{ 
+                    'balance':str(temp)
+                }
+        })
+   
 
     # elif request.method == 'POST':
     # return HttpResponse("")
-    pass
 
 
 # Create your views here.
-def encrypt_data(request):
-    if request.method == 'POST':
-        data = request.POST.get('data')
-        p = Pyfhel()
-        encrypted_data = p.encrypt(data)
-        return JsonResponse({'encrypted_data': encrypted_data})
+def encrypt_data(val):
+    '''Encrypt value'''
+    HE = Pyfhel() # Create a Pyfhel object
+    HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/context") # Load context from file
+    HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/public.key") # Load context from file
+    HE.load_secret_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/secret.key") # Load context from file
+    encrypted_data=np.array([val], dtype=np.int64)
+    encrypted_data=HE.encryptInt(encrypted_data)
+    return encrypted_data
+
+def decrypt_data(val):
+    '''Decrypt value'''
+    HE = Pyfhel() # Create a Pyfhel object
+    HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/context") # Load context from file
+    HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/public.key") # Load context from file
+    HE.load_secret_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/secret.key") # Load context from file
+    val=HE.decryptInt(val)
+    return val
+
+
 
 
 
@@ -80,18 +105,34 @@ def transaction_api(request):
             ]
         })
 
+#Withdraw Or Deposit
     elif request.method == 'POST':
         # gets the json data from the frontend
         data = json.loads(request.body)
         # Creates new object and adds it to the existing object
         userId = request.session.get('_auth_user_id')
-
+        val=int(float(data['amount'])*100)  #Multiply by 100 as im using BFV scheme
+        temp=np.array([val], dtype=np.int64)
+        encrypted_data=HE.encryptInt(temp)
         transaction=Transaction.objects.create(
             type=data['type'],
-            amount=data['amount'],
+            amount=pickle.dumps(encrypted_data), #turns it into binary so i can store it in Django Models..
             date=data['date'],
             account=get_object_or_404(User,id=userId)
+            
         )
+        user = User.objects.get(id=userId)
+        if len(user.balance)==0:
+            user.balance=pickle.dumps(encrypted_data) 
+            user.save()
+        else:
+            temp=user.balance
+            # bytes_obj =temp.encode('utf-8')
+            bal= pickle.loads(temp)
+            bal+=encrypted_data
+            user.balance=pickle.dumps(bal)
+            
+        user.save()
         return JsonResponse({
             'transaction':[transaction.to_dict()]
             })
@@ -110,6 +151,30 @@ def login_view(request):
             return response
     return render(request, 'login.html')
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def logout_view(request):
     logout(request)
