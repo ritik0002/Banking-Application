@@ -4,21 +4,71 @@
       <title>Login</title>
     </head>
     <body>
-  <h1>Login</h1>
+      <div class="title-container">
+           <h2 class="name">App Name</h2>
+      </div>
+      <div class="container">
+  <h1 class="Title">Sign in</h1>
   <form method="POST" action="">
     {% csrf_token %}
-    <div class="login-clean">
+    <div class="login">
+      <h4>Username</h4>
         <div class="form-group"><input class="form-control"  name="username" placeholder="Email"></div>
+        <h4>Password</h4>
         <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password"></div>
         <button class="btn btn-primary btn-dark" type="submit">Login</button>
     </div>
   </form>
-  <div>
-
-    <div class="">
+  <div class="register">
+    <hr> 
+    <div class="font-weight-normal text-dark">
         Don't have an account? <a href="{% url 'register' %}" class="">Sign Up</a>
     </div>
+</div>
 </div>
 </body>
 <html>
 
+<style scoped>
+.Title{
+  text-align: center;
+}
+.container{
+  border:solid black 2px;
+  padding:1%;
+  margin-top: 5%;
+  background-color:#F5F5F5;
+  width:60%;
+  border-radius:2%;
+
+}
+.form-group{
+  width:60%;
+  
+}
+.login{
+  margin-left:10%;
+}
+br{
+  border:solid black 2px;
+}
+h3{
+  font-weight: 300;
+  font-size:1.25em;
+}
+.register{
+  margin-left:10%;
+}
+body{
+  background-color:#02093B;
+}
+.name{
+  text-align:center;
+  color:white;
+}
+.title-container{
+  background-color:black;
+  padding:1%;
+  border-radius:3%;
+}
+</style>

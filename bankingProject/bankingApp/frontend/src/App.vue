@@ -4,6 +4,7 @@ import Home from './components/home.vue';
 import Navbar from './components/navbar.vue';
 
 import {RouterView} from 'vue-router';
+import Footer from './components/footer.vue';
 </script>
 
 <template>
@@ -11,6 +12,9 @@ import {RouterView} from 'vue-router';
   
 
   <RouterView></RouterView>
+  
+  <Footer />
+
 </template>
 
 

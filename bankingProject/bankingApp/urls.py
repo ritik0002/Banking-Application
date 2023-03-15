@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('api/transaction/filter/', views.transaction_filter_api, name="bank_filter_api"),
+
     path('api/transaction/', views.transaction_api, name="bank_api"),
         #User API paths
     # path('api/users/', views.users_api, name="users"),

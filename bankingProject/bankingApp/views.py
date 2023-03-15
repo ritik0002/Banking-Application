@@ -43,7 +43,7 @@ def users_api(request,userID):
         else:
             # bytes_obj = user.balance.encode('utf-8')
             temp=pickle.loads(user.balance)  #turn the byte string back into object
-            temp=decrypt_data(temp)[0]/100
+            temp=decrypt_data(temp)[0]
             return JsonResponse({
                 'user':{ 
                     'balance':str(temp)
@@ -62,7 +62,7 @@ def encrypt_data(val):
     HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/context") # Load context from file
     HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/public.key") # Load context from file
     HE.load_secret_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/secret.key") # Load context from file
-    encrypted_data=np.array([val], dtype=np.int64)
+    encrypted_data=np.array([(val*100)], dtype=np.int64)
     encrypted_data=HE.encryptInt(encrypted_data)
     return encrypted_data
 
@@ -72,10 +72,31 @@ def decrypt_data(val):
     HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/context") # Load context from file
     HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/public.key") # Load context from file
     HE.load_secret_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/secret.key") # Load context from file
-    val=HE.decryptInt(val)
+    val=HE.decryptInt(val)/100
     return val
 
 
+
+def transaction_filter_api(request):
+    if request.method =="GET":
+        withdraw = Transaction.objects.filter(type='D')
+        deposit=Transaction.objects.filter(type='W')
+        total1=encrypt_data(0)  # withdraw total  
+        total2=encrypt_data(0)  # deposit total
+        for x in withdraw:
+            total1+=pickle.loads(x.amount)
+        for k in deposit:
+            total2+=pickle.loads(k.amount)
+        total1=decrypt_data(total1)[0]
+        total2=decrypt_data(total2)[0]
+
+        return JsonResponse({
+            'Transaction':{
+            'withdrawals':total1,
+            'deposits':total2,
+            }
+            
+        })
 
 
 
@@ -104,7 +125,6 @@ def transaction_api(request):
                 for Transaction in Transaction.objects.all()
             ]
         })
-
 #Withdraw Or Deposit
     elif request.method == 'POST':
         # gets the json data from the frontend
@@ -121,18 +141,27 @@ def transaction_api(request):
             account=get_object_or_404(User,id=userId)
             
         )
-        user = User.objects.get(id=userId)
-        if len(user.balance)==0:
-            user.balance=pickle.dumps(encrypted_data) 
-            user.save()
+        user = User.objects.get(id=userId)  #get current user object
+
+        if data['type']=='D':
+            if len(user.balance)==0:
+                user.balance=pickle.dumps(encrypted_data) 
+                user.save()
+            else:
+                temp=user.balance
+                # bytes_obj =temp.encode('utf-8')
+                bal= pickle.loads(temp)
+                bal+=encrypted_data    #adding encrypting values together!
+                user.balance=pickle.dumps(bal)
+                user.save()
         else:
-            temp=user.balance
-            # bytes_obj =temp.encode('utf-8')
-            bal= pickle.loads(temp)
-            bal+=encrypted_data
-            user.balance=pickle.dumps(bal)
-            
-        user.save()
+            # Withdrawal
+                temp=user.balance
+                # bytes_obj =temp.encode('utf-8')
+                bal= pickle.loads(temp)
+                bal-=encrypted_data
+                user.balance=pickle.dumps(bal)
+                user.save()
         return JsonResponse({
             'transaction':[transaction.to_dict()]
             })
@@ -151,29 +180,6 @@ def login_view(request):
             return response
     return render(request, 'login.html')
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def logout_view(request):
