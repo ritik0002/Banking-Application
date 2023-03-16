@@ -10,7 +10,7 @@ class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True,max_length=255, help_text="Required", widget=forms.EmailInput(attrs={'placeholder': 'Enter your email address',} ))
     username = forms.CharField(label='Username', max_length=100,widget=forms.TextInput(attrs={'placeholder': 'Enter a username',}))
     first_name=forms.CharField(label='fname', max_length=100,widget=forms.TextInput(attrs={'placeholder': 'Enter your firstname',}))
-    last_name=forms.CharField(label='sname', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Enter your  surname',}))
+    last_name=forms.CharField(label='sname', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Enter your surname',}))
     password1 = forms.CharField(label='Password1', max_length=100,widget=forms.PasswordInput(attrs={'placeholder': 'Enter a password',}))
     password2 = forms.CharField(label='Password2', max_length=100,widget=forms.PasswordInput(attrs={'placeholder': 'Re-enter your password', }))
 

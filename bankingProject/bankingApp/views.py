@@ -79,8 +79,8 @@ def decrypt_data(val):
 
 def transaction_filter_api(request):
     if request.method =="GET":
-        withdraw = Transaction.objects.filter(type='D')
-        deposit=Transaction.objects.filter(type='W')
+        withdraw = Transaction.objects.filter(type='W')
+        deposit=Transaction.objects.filter(type='D')
         total1=encrypt_data(0)  # withdraw total  
         total2=encrypt_data(0)  # deposit total
         for x in withdraw:
@@ -113,7 +113,7 @@ def transaction_api(request):
         encrypted_data=HE.encryptInt(val)
         decrypted_data =HE.decryptInt(encrypted_data)[0]
         decrypted_data=decrypted_data/100
-    
+
         
         return JsonResponse({
             'encrypted_data':str(encrypted_data),
@@ -152,8 +152,10 @@ def transaction_api(request):
                 # bytes_obj =temp.encode('utf-8')
                 bal= pickle.loads(temp)
                 bal+=encrypted_data    #adding encrypting values together!
+                print("HELLLLO",(HE.noise_level((bal))))
                 user.balance=pickle.dumps(bal)
                 user.save()
+
         else:
             # Withdrawal
                 temp=user.balance

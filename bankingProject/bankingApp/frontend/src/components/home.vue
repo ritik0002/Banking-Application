@@ -1,8 +1,12 @@
 <template>
+     <div class="Info">
+            <h1 class="lead display-5">Account Information</h1>
+            <p class="lead text-muted">Withdraw and deposit and view your balance<br>See your total transactions </p>
+        </div>
     <div class="container">
-
         <div class="row">
-            <h1 class="Title">Account Information</h1>
+           
+            <h1 class="Title"></h1>
 
             <div class="col-6">
 
@@ -33,24 +37,11 @@
             </div>
             <div class="col-6">
                 <div class="c2 col">
-                    <h2 class="balance d-inline">Current Balance: £{{ balance }}</h2>
+                    <h2 class="balance d-inline">Current Balance: £{{balancedp }}</h2>
                     <!-- id:{{ id }} -->
                 </div>
                 <div class="col w-75 mx-auto">
-                    <CChart type="pie" :data="{
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false, // This will prevent the chart from scaling proportionally
-                        },
-                        labels: ['Deposit','Withdraw'],
-                        datasets: [
-                            {
-                                backgroundColor: ['#41B883', '#00D8FF'],
-                                data:[this.Transactions.deposits.toFixed(2),this.Transactions.withdrawals.toFixed(2)],
-                            },                        
-                        ],
-                        hoverOffset: 4,
-                    }" />
+                    <CChart type="pie" ref="chart" :data="chartValues"/>
                 </div>
             </div>
         </div>
@@ -89,6 +80,27 @@ export default {
     components: {
         CChart
     },
+    computed:{
+        balancedp(){
+            let temp=Number(this.balance)
+            return temp.toFixed(2);
+        },
+        chartValues(){
+            return {options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // This will prevent the chart from scaling proportionally
+                        },
+                        labels: ['Deposit','Withdraw'],
+                        datasets: [
+                            {
+                                backgroundColor: ['#41B883', '#00D8FF'],
+                                data:[this.Transactions.deposits.toFixed(2),this.Transactions.withdrawals.toFixed(2)],
+                            },                        
+                        ],
+                        hoverOffset: 4,
+        }
+    },
+},
     data() {
         return {
             d_val:null,
@@ -97,7 +109,7 @@ export default {
             inputData: null,
             inputData2: null,
             amount: null,
-            Transactions:null,
+            Transactions:{"withdrawals":0,"deposits":0},
             balance: null,
             id: null,
 
@@ -127,12 +139,15 @@ export default {
             this.Transactions = data.Transaction;
             console.log(this.Transactions.withdrawals)
             console.log(this.Transactions["deposits"])
+            // this.chart.chartData.datasets[0].data = [this.Transactions.withdrawals,this.Transactions.deposits];
+            // this.chart.update();
         },
         async saveWithdraw() {
             if (parseFloat(this.balance) < (parseFloat(parseFloat(this.inputData2).toFixed(2)))) {
                 document.getElementById("errorMessage").innerHTML = "Error withdrawal amount is larger than balance!"
             } else {
-                let current_day = new Date().toISOString().slice(0, 10)
+                let current_day =new Date().toISOString().slice(0, 19).replace('T', ' ');
+
                 const Transaction = JSON.stringify({
                     amount: parseFloat(this.inputData2).toFixed(2),
                     type: "W",
@@ -149,7 +164,7 @@ export default {
                     },
                     body: Transaction,
                 })
-                this.$data._chart.update()
+                this.fetch_Transactions();
                 this.fetch_Balance();
 
             }
@@ -158,7 +173,8 @@ export default {
 
         },
         async saveDeposit() {
-            let current_day = new Date().toISOString().slice(0, 10)
+            let current_day =new Date().toISOString().slice(0, 19).replace('T', ' ');
+
 
             const Transaction = JSON.stringify({
                 amount: parseFloat(this.inputData).toFixed(2),
@@ -176,7 +192,7 @@ export default {
                 },
                 body: Transaction,
             })
-            this.$data._chart.update()
+            this.fetch_Transactions();
             this.fetch_Balance();
 
 
@@ -195,10 +211,20 @@ export default {
         this.getSession();
         // this.fetch_user();
         this.fetch_Transactions();
+        // this.$nextTick(() => {
+        //     this.$refs.chart.chartObject.update();
+        // }, 0);
+        this.$nextTick(() => {
+            if (this.$refs.chart.chartObject) {
+                this.$refs.chart.chartObject.update();
+            }
+        }, 0);
     },
     created(){
+        this.Transactions={"withdrawals":0,"deposits":0};
         this.fetch_Transactions();  
-    }
+    },
+
 }
 </script>
 
@@ -241,6 +267,21 @@ export default {
 }
 .Title{
     margin-top:2%;
+}
+
+
+.Info{
+    color:white;
+    height:15%;
+    /* background-color: #02093B; */
+    background-image: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+    padding:2%;
+
+    /* /* font: ; */
+}
+.Info p{
+    margin-left:5%;
+
 }
 
 

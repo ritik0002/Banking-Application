@@ -28,23 +28,27 @@ class User(AbstractUser):
 class Transaction(models.Model):
     Deposit= 'D'
     Withdrawal='W'
+    Transfer='T'
     Type = [
         (Deposit, 'Deposit'),
         (Withdrawal, 'Withdrawal'),
+         (Transfer,'Transfer'),
     ]
     type = models.CharField(
         max_length=20,
         choices=Type,
         default=Deposit,
     )
+    description=models.TextField(blank=True)
     amount=models.BinaryField()
     account = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
-    date=models.DateField(blank=False, null=False, default=None)
+    date=models.DateTimeField(blank=False, null=False, default=None)
     def to_dict(self):
         """Returns a dictionary of item contents"""
         return {
-            'amount':json.dumps(base64.b64encode(pickle.dumps(self.amount)).decode("utf-8")),
-            # 'amount':json.dumps(str(pickle.loads(self.amount))),
+            'id':self.id,
+            # 'amount':json.dumps(base64.b64encode(pickle.dumps(self.amount)).decode("utf-8")),  #Shows the binary data
+            'amount':json.dumps(str(pickle.loads(self.amount))), #returns the encrypted String value instead of binary value stored in the database
 
             'account' : self.account.to_dict(),
             'date':self.date,

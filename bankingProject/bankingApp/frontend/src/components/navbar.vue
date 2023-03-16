@@ -9,9 +9,11 @@
                         <div class="nav-link"><router-link to="/">Morgage Calculator</router-link></div>
                     </li>
                     <li class="nav-item">
-                        <div class="nav-link"><router-link to="/">Transactions</router-link></div>
+                        <div class="nav-link"><router-link to="savings">Saving Planner</router-link></div>
                     </li>
-
+                    <li class="nav-item">
+                        <div class="nav-link"><router-link to="transaction-history">Transaction History</router-link></div>
+                    </li>
                     <li class="nav-item">
                         <div class="nav-link"><router-link to="/">Account Infomation</router-link></div>
                     </li>

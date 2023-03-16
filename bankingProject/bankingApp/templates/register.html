@@ -25,9 +25,9 @@
                             <p style="color: red;">{{error}}</p>
                 {% endfor %}     
             {% endfor %}
-            <button type="submit">submit</button>  
+            <button type="submit">Submit</button>  
             </form>  
-            <div class="account">Account already exists? <a href="{% url 'login' %}">Here</a> </div>
+            <div class="account">Account already exists? <a href="{% url 'login' %}">Login</a> </div>
             <h1>
     </div>
     </body>
@@ -57,7 +57,7 @@ input{
 button{
     margin-top: 2%;
     width: 30%;
-    margin-left: 10%;
+    align-self: center;
     border:solid black 2px;
     background-color:white;
     color:black;
@@ -70,6 +70,7 @@ form{
 }
 .fields{
     flex-grow: 1;
+    text-align:center;
 }
 .account{
     font-weight: bold;
@@ -86,6 +87,9 @@ body{
     background-color:black;
     padding:1%;
     border-radius:3%;
+  }
+  .account{
+    text-align:center;
   }
 
 </style>
