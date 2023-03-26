@@ -6,7 +6,7 @@
                 <ul class="navbar-nav">
 
                     <li class="nav-item">
-                        <div class="nav-link"><router-link to="/">Morgage Calculator</router-link></div>
+                        <div class="nav-link"><router-link to="/transfer">Transfer Money</router-link></div>
                     </li>
                     <li class="nav-item">
                         <div class="nav-link"><router-link to="savings">Saving Planner</router-link></div>

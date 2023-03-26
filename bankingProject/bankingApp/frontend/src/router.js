@@ -7,6 +7,8 @@ const routes = [
     { path: '/logout', name: "logout", component: () => import('./components/logout.vue') },
     { path: '/savings', name: "savings", component: () => import('./components/saving.vue') },
     { path: '/transaction-history', name: "history", component: () => import('./components/history.vue') },
+    { path: '/transfer', name: "transfer", component: () => import('./components/Transfer.vue') },
+
     // { path: '/test', name: "item", component: () => import('./components/AddItem.vue') },
 ]
 

@@ -122,7 +122,7 @@ export default {
             let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
             let data1 = await response1.json();
             this.id = data1.User.id   //gets current user id
-            let response = await fetch("http://localhost:8000/api/users/" + this.id + "/");
+            let response = await fetch("http://127.0.0.1:8000/api/user/"+this.id);
             //turn the data into json and fetches the data from the backend
             let data = await response.json();
             //retrieve balance
@@ -130,8 +130,11 @@ export default {
             console.log(`This is balance:${this.balance}`)
         },
         async fetch_Transactions() {
+            let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data1 = await response1.json();
+            this.id = data1.User.id   //gets current user id
             //ajax request to perform list recipes
-            let response = await fetch("http://localhost:8000/api/transaction/filter/");
+            let response = await fetch("http://localhost:8000/api/transaction/filter/"+this.id+"/");
             //turn the data into json and fetches the data from the backend
             let data = await response.json();
             console.log(data.Transaction)
@@ -143,6 +146,9 @@ export default {
             // this.chart.update();
         },
         async saveWithdraw() {
+            let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data1 = await response1.json();
+            this.id = data1.User.id   //gets current user id
             if (parseFloat(this.balance) < (parseFloat(parseFloat(this.inputData2).toFixed(2)))) {
                 document.getElementById("errorMessage").innerHTML = "Error withdrawal amount is larger than balance!"
             } else {
@@ -154,7 +160,7 @@ export default {
                     date: current_day,
                 })
 
-                let response = await fetch("http://127.0.0.1:8000/api/transaction/", {
+                let response = await fetch("http://127.0.0.1:8000/api/transaction/"+this.id+"/", {
                     method: 'POST',
                     credentials: "include",
                     mode: "cors",
@@ -173,6 +179,10 @@ export default {
 
         },
         async saveDeposit() {
+            let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data1 = await response1.json();
+            this.id = data1.User.id   //gets current user id
+
             let current_day =new Date().toISOString().slice(0, 19).replace('T', ' ');
 
 
@@ -182,7 +192,7 @@ export default {
                 date: current_day,
             })
 
-            let response = await fetch("http://127.0.0.1:8000/api/transaction/", {
+            let response = await fetch("http://127.0.0.1:8000/api/transaction/"+this.id+"/", {
                 method: 'POST',
                 credentials: "include",
                 mode: "cors",
@@ -201,6 +211,7 @@ export default {
         async getSession() {
             let response = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
             let data = await response.json();
+            this.id=data.User.id
             if (data.User == "None") {
                 window.location.href = "http://127.0.0.1:8000/login/"
             }

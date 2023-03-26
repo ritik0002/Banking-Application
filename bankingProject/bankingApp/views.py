@@ -32,7 +32,9 @@ def sessionUser(request):
 
 def users_api(request,userID):
     """API handling user balance. Fetches the balance and decrypts it."""
-    if request.method == 'GET':        
+    if request.method == 'GET': 
+        # return HttpResponse("checkQ",request.user.id)
+        # userID=request.session.get('_auth_user_id')     
         user=get_object_or_404(User,id=userID)
         if len(user.balance)==0:
             return JsonResponse({
@@ -77,10 +79,22 @@ def decrypt_data(val):
 
 
 
-def transaction_filter_api(request):
+
+def current_transaction_api(request,TransactionId:int):
     if request.method =="GET":
-        withdraw = Transaction.objects.filter(type='W')
-        deposit=Transaction.objects.filter(type='D')
+        transaction = get_object_or_404(Transaction, id=TransactionId)
+        amount=pickle.loads(transaction.amount)
+        amount=decrypt_data(amount)[0]
+        return JsonResponse({
+            'Transaction':{
+            'amount':amount,
+            }
+            
+        })
+def transaction_filter_api(request,userID):
+    if request.method =="GET":
+        withdraw = Transaction.objects.filter(account__id=userID,type='W')
+        deposit=Transaction.objects.filter(account__id=userID,type='D')
         total1=encrypt_data(0)  # withdraw total  
         total2=encrypt_data(0)  # deposit total
         for x in withdraw:
@@ -100,7 +114,8 @@ def transaction_filter_api(request):
 
 
 
-def transaction_api(request):
+def transaction_api(request,userID):
+    user=get_object_or_404(User,id=userID)
     HE = Pyfhel() # Create a Pyfhel object
     HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/context") # Load context from file
     HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/Banking-Application/bankingProject/bankingApp/public.key") # Load context from file
@@ -122,7 +137,7 @@ def transaction_api(request):
                 # Gives the data for the object
                 Transaction.to_dict()
                 # Transportation.object.all() gets all the transportation objects
-                for Transaction in Transaction.objects.all()
+                for Transaction in (Transaction.objects.filter(account__id=userID))
             ]
         })
 #Withdraw Or Deposit
@@ -130,7 +145,7 @@ def transaction_api(request):
         # gets the json data from the frontend
         data = json.loads(request.body)
         # Creates new object and adds it to the existing object
-        userId = request.session.get('_auth_user_id')
+        userId = userID
         val=int(float(data['amount'])*100)  #Multiply by 100 as im using BFV scheme
         temp=np.array([val], dtype=np.int64)
         encrypted_data=HE.encryptInt(temp)
@@ -141,7 +156,7 @@ def transaction_api(request):
             account=get_object_or_404(User,id=userId)
             
         )
-        user = User.objects.get(id=userId)  #get current user object
+        user = User.objects.get(id=userID)  #get current user object
 
         if data['type']=='D':
             if len(user.balance)==0:
@@ -152,7 +167,6 @@ def transaction_api(request):
                 # bytes_obj =temp.encode('utf-8')
                 bal= pickle.loads(temp)
                 bal+=encrypted_data    #adding encrypting values together!
-                print("HELLLLO",(HE.noise_level((bal))))
                 user.balance=pickle.dumps(bal)
                 user.save()
 
@@ -165,7 +179,7 @@ def transaction_api(request):
                 user.balance=pickle.dumps(bal)
                 user.save()
         return JsonResponse({
-            'transaction':[transaction.to_dict()]
+            'transaction':[Transaction.objects.filter(type=data['type'])]
             })
         
 
