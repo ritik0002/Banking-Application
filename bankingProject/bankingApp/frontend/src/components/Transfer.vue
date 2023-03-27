@@ -11,15 +11,15 @@
             <div class="t1 col-6">
                 <h1>Transfer funds</h1>
                 <hr>
-                 <form @submit="sendTransfer">
+                 <form @submit.prevent="sendTransfer">
                     Transfer to:
-                    <input class="form-control" type="text" placeholder="Default input" v-model="username">
+                    <input class="form-control" type="text" placeholder="Enter Username" v-model="username">
                     Description:
                     <input class="form-control" type="text" placeholder="Default input" v-model="desc">
                     Amount:
                     <input class="form-control" type="Number" step="0.01" placeholder="enter a number" v-model="amount">
                     <button class="sub btn btn-dark" type="submit">Submit</button>
-
+                    <p id="errorMessage"></p>
                 </form>
             </div>
             <div class="col-6">
@@ -57,6 +57,11 @@ export default {
         return {
         x:null,
         balance:null,
+        users:null,
+        username:"",
+        amount:null,
+        desc:"",
+
 
         }
     },
@@ -85,7 +90,41 @@ export default {
             }
         },
         async sendTransfer(){
+            let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data1 = await response1.json();
+            let response2 = await fetch("http://127.0.0.1:8000/api/users/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })
+            let data2 = await response2.json();
+            this.users=data2.user
+            this.id = data1.User.id   //gets current user id
+            let result=this.users.some(x=>x.username===this.username)
+            if(result==false){
+                document.getElementById("errorMessage").innerHTML = "Error invalid username!"
+            }
+            else if (parseFloat(this.balance) < (parseFloat(parseFloat(this.inputData2).toFixed(2)))) {
+                document.getElementById("errorMessage").innerHTML = "Error Transfer amount is larger than balance!"
+            } else {
+                document.getElementById("errorMessage").innerHTML = ""
+                let current_day =new Date().toISOString().slice(0, 19).replace('T', ' ');
+                const Transaction = JSON.stringify({
+                    amount: parseFloat(this.amount).toFixed(2),
+                    type: "T",
+                    date: current_day,
+                    desc:this.desc,
+                    username:this.username,
+                })
 
+                let response = await fetch("http://127.0.0.1:8000/api/transaction/"+this.id+"/", {
+                    method: 'POST',
+                    credentials: "include",
+                    mode: "cors",
+                    referrerPolicy: "no-referrer",
+                    headers: {
+                        'X-CSRFToken': getCookie("csrftoken"),
+                    },
+                    body: Transaction,
+                })
+                this.fetch_Balance();
+            }
         },
         async fetch_Balance() {
             let response1 = await fetch("http://127.0.0.1:8000/api/sessionUser/", { credentials: "include", mode: "cors", referrerPolicy: "no-referrer" })

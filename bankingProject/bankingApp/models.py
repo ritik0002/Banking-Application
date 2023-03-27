@@ -49,7 +49,7 @@ class Transaction(models.Model):
             'id':self.id,
             # 'amount':json.dumps(base64.b64encode(pickle.dumps(self.amount)).decode("utf-8")),  #Shows the binary data
             'amount':json.dumps(str(pickle.loads(self.amount))), #returns the encrypted String value instead of binary value stored in the database
-
+            'description':self.description,
             'account' : self.account.to_dict(),
             'date':self.date,
             'type':self.type

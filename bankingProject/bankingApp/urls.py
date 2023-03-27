@@ -8,7 +8,7 @@ urlpatterns = [
     path('api/transactions/<int:TransactionId>/', views.current_transaction_api),
 
         #User API paths
-    # path('api/users/', views.users_api, name="users"),
+    path('api/users/', views.user_api,),
     path('api/user/<int:userID>/', views.users_api, name="user"),
     path('api/sessionUser/', views.sessionUser, name="sessionUser"),
     

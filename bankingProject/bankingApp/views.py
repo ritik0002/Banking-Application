@@ -29,6 +29,14 @@ def sessionUser(request):
 
     return HttpResponse("")
 
+def user_api(request):
+    if request.method == 'GET': 
+        return JsonResponse({
+            'user': [
+                user.to_dict()
+                for user in User.objects.all()
+            ]
+        })
 
 def users_api(request,userID):
     """API handling user balance. Fetches the balance and decrypts it."""
@@ -123,16 +131,16 @@ def transaction_api(request,userID):
     # HE.load_public_key("public.key") # Load public key from file
     # HE.load_secret_key("secret.key") # Load secret key from file
     if request.method == 'GET':
-        val=np.array([1499], dtype=np.int64)
+        # val=np.array([1499], dtype=np.int64)
 
-        encrypted_data=HE.encryptInt(val)
-        decrypted_data =HE.decryptInt(encrypted_data)[0]
-        decrypted_data=decrypted_data/100
+        # encrypted_data=HE.encryptInt(val)
+        # decrypted_data =HE.decryptInt(encrypted_data)[0]
+        # decrypted_data=decrypted_data/100
 
         
         return JsonResponse({
-            'encrypted_data':str(encrypted_data),
-            'decrypted_data':str(decrypted_data),
+            # 'encrypted_data':str(encrypted_data),
+            # 'decrypted_data':str(decrypted_data),
             'Transaction': [
                 # Gives the data for the object
                 Transaction.to_dict()
@@ -153,8 +161,8 @@ def transaction_api(request,userID):
             type=data['type'],
             amount=pickle.dumps(encrypted_data), #turns it into binary so i can store it in Django Models..
             date=data['date'],
-            account=get_object_or_404(User,id=userId)
-            
+            account=get_object_or_404(User,id=userId),
+            description=data.get('desc', ""),
         )
         user = User.objects.get(id=userID)  #get current user object
 
@@ -170,7 +178,7 @@ def transaction_api(request,userID):
                 user.balance=pickle.dumps(bal)
                 user.save()
 
-        else:
+        elif data['type']=='W':
             # Withdrawal
                 temp=user.balance
                 # bytes_obj =temp.encode('utf-8')
@@ -178,6 +186,31 @@ def transaction_api(request,userID):
                 bal-=encrypted_data
                 user.balance=pickle.dumps(bal)
                 user.save()
+        else:
+            #Transfer
+            #withdraw user account
+            temp=user.balance
+            # bytes_obj =temp.encode('utf-8')
+            bal= pickle.loads(temp)
+            bal-=encrypted_data
+            user.balance=pickle.dumps(bal)
+            user.save()
+            #deposit sender account
+            sender=get_object_or_404(User,username=data['username'])
+            temp2=sender.balance
+            bal2=pickle.loads(temp2)
+            bal2+=encrypted_data
+            sender.balance=pickle.dumps(bal2)
+            sender.save()
+          #create transfer object to sender
+            transaction=Transaction.objects.create(
+            type=data['type'],
+            amount=pickle.dumps(encrypted_data), #turns it into binary so i can store it in Django Models..
+            date=data['date'],
+            description="(Recipenent)\n"+data['desc'],
+            account=sender
+            
+        )
         return JsonResponse({
             'transaction':[Transaction.objects.filter(type=data['type'])]
             })
