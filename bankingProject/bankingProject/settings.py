@@ -36,7 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-ALLOWED_HOST = ['cipher-bank.azurewebsite.net']
+ALLOWED_HOST = ['cipher-bank.azurewebsites.net']
 
 LOGIN_REDIRECT_URL = "http://127.0.0.1:5173/"
 CORS_ORIGIN_ALLOW_ALL = True
