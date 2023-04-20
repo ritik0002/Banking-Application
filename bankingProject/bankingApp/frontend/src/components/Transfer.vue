@@ -172,10 +172,10 @@ export default {
 }
 .bal{
     font-weight: 400;
-    border:solid rgb(205, 205, 205) 2px;
+    /* border:solid rgb(205, 205, 205) 2px; */
     border-radius: 2%;
     padding:1%;
-    margin-left:5%;
+    /* margin-left:5%; */
     margin-top:100%;
 }
 .t1{

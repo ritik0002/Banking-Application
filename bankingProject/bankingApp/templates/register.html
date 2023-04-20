@@ -8,11 +8,11 @@
     </head>
     <body>
         <div class="title-container">
-            <h2 class="name">App Name</h2>
+            <h2 class="name"><a href="{% url 'home' %}"><img src="/media/logo.png" alt="logo" class="logo"></a> </h2>
        </div>
-    {% if request.user.is_authenticated %}
+    {% comment %} {% if request.user.is_authenticated %}
         <p>You are currently logged in as {{request.user.username}} | <a href="{% url 'logout' %}">Logout</a> </p>
-    {% endif %}
+    {% endif %} {% endcomment %}
     <div class="container">
         <h1 class="register">Register</h1>
             <form method="post" enctype="multipart/form-data">
@@ -20,10 +20,12 @@
             {% for x in register %}
                 <div class="fields">
                     {{x}}   
-                </div>    
+                </div> 
+                <div class="error-class">   
                 {% for error in x.errors %}
                             <p style="color: red;">{{error}}</p>
-                {% endfor %}     
+                {% endfor %}  
+                </div>   
             {% endfor %}
             <button type="submit">Submit</button>  
             </form>  
@@ -81,7 +83,12 @@ body{
 
   .name{
     text-align:center;
-    color:white;
+    margin-left:auto;
+    margin-right:auto;
+  
+  }
+  .logo{
+    width:3em;
   }
   .title-container{
     background-color:black;
@@ -90,6 +97,11 @@ body{
   }
   .account{
     text-align:center;
+  }
+
+  .error-class{
+    text-align: center;
+
   }
 
 </style>

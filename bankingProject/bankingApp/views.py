@@ -8,7 +8,8 @@ from .models import *
 import numpy as np
 from Pyfhel import Pyfhel
 import pickle
-
+import math
+from datetime import datetime
 
 def sessionUser(request):
     """checks to see if user is logged in"""
@@ -60,9 +61,18 @@ def users_api(request,userID):
                 }
         })
    
+def deleteUser(request):
+    data=json.loads(request.body)
+    # return HttpResponse(data['username'])
 
-    # elif request.method == 'POST':
-    # return HttpResponse("")
+    user = get_object_or_404(User, username=data['username'])
+    # return HttpResponse(user)
+    user.delete()
+    return JsonResponse({
+        'response':"user deleted!",
+                         })
+
+
 
 
 # Create your views here.
@@ -86,6 +96,50 @@ def decrypt_data(val):
     return val
 
 
+def Calculator(request):
+    """Handles saving Calculator """
+    data=json.loads(request.body)
+    #use given balance
+    result=0
+
+
+    if data['check']=="no":
+        if data['balance']>=data['goal']:
+            return JsonResponse({
+                'response':"Balance is greater or already equal to the saving goal",
+
+            })
+        # return HttpResponse(data['goal'])
+        amount=float(data['goal'])-float(data['balance'])
+        result=amount/float(data['amount'])
+        result=math.ceil(result)  #round up
+        
+        return JsonResponse({
+            'response':f"To achieve £{amount} it will take {result} months",
+
+        })
+    elif data['check']=="yes":
+        #get current balance
+        userId = request.session.get('_auth_user_id')
+        user = User.objects.filter(id=userId)[0]
+        if len(user.balance)==0:
+            balance=0
+        else:
+            temp=pickle.loads(user.balance)  #turn the byte string back into object
+            balance=decrypt_data(temp)[0]
+        if balance>=float(data['goal']):
+            return JsonResponse({
+                'response':"Balance is greater or already equal to the saving goal",
+
+            })
+        else:
+            amount=float(data['goal'])-balance
+            result=amount/float(data['amount'])
+            result=math.ceil(result)  #round up   
+            return JsonResponse({
+                'response':f"To achieve £{amount} it will take {result} months",
+
+            })
 
 
 def current_transaction_api(request,TransactionId:int):
@@ -132,7 +186,6 @@ def transaction_api(request,userID):
     # HE.load_secret_key("secret.key") # Load secret key from file
     if request.method == 'GET':
         # val=np.array([1499], dtype=np.int64)
-
         # encrypted_data=HE.encryptInt(val)
         # decrypted_data =HE.decryptInt(encrypted_data)[0]
         # decrypted_data=decrypted_data/100
@@ -145,7 +198,7 @@ def transaction_api(request,userID):
                 # Gives the data for the object
                 Transaction.to_dict()
                 # Transportation.object.all() gets all the transportation objects
-                for Transaction in (Transaction.objects.filter(account__id=userID))
+                for Transaction in (Transaction.objects.filter(account__id=userID).order_by('-date'))
             ]
         })
 #Withdraw Or Deposit
@@ -207,14 +260,55 @@ def transaction_api(request,userID):
             type=data['type'],
             amount=pickle.dumps(encrypted_data), #turns it into binary so i can store it in Django Models..
             date=data['date'],
-            description="(Recipenent)\n"+data['desc'],
+            description="(Recipient)\n"+data['desc'],
             account=sender
             
         )
         return JsonResponse({
             'transaction':[Transaction.objects.filter(type=data['type'])]
             })
-        
+
+
+def superUser(request):
+    userId = request.session.get('_auth_user_id')
+    user=get_object_or_404(User,id=userId)
+    return JsonResponse({
+        'check': user.is_superuser
+    })
+  
+
+"""Support page"""
+def support(request):
+    if request.method == 'GET':
+        return JsonResponse({
+            # 'encrypted_data':str(encrypted_data),
+            # 'decrypted_data':str(decrypted_data),
+            'Tickets': [
+                # Gives the data for the object
+                Support.to_dict()
+                for Support in Support.objects.all()
+
+            ]
+        })
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        ticket=Support.objects.create(
+            subject=data['subject'],
+            description=data['description'],
+            account=get_object_or_404(User,username=data['username']),
+            date=datetime.now(),
+        )
+        return JsonResponse({
+            'Ticket':ticket
+            })
+
+
+
+"""" Login,logout,home pages"""
+def home(request):
+        return render(request, 'home.html')
+
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -230,6 +324,23 @@ def login_view(request):
     return render(request, 'login.html')
     
 
+
+def password(request):
+    data = json.loads(request.body)
+
+    user= authenticate(username=data['username'],password=data['password'])
+    if user is not None:
+        # The credentials are valid
+        user.set_password(data['new_password'])
+        user.save()
+        return JsonResponse({
+            'response':"password updated!",
+        })
+    else:
+        # The credentials are invalid
+        return JsonResponse({
+            'response':"password is incorrect!",
+        })
 
 def logout_view(request):
     logout(request)

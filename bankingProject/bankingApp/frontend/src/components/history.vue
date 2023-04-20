@@ -26,7 +26,7 @@
                         <!-- Template element doesn't effect the HTML elements (so table contents stay) -->
                         <template v-if="type[x.type].includes(searchQuery.toLowerCase())===true || searchQuery===''">
                         <td>{{ x.id }}</td>
-                        <td>{{ x.date }}</td>
+                        <td>{{  new Date(x.date).toLocaleString("en-GB")}}</td>
                         <td>
                             <div v-if="x.type === 'D'">
                                 Deposit
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+
 function getCookie(name) {
     let cookieValue = "";
     if (document.cookie && document.cookie !== '') {

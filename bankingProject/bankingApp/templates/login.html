@@ -5,8 +5,9 @@
     </head>
     <body>
       <div class="title-container">
-           <h2 class="name">App Name</h2>
+           <h2 class="name"><a href="{% url 'home' %}"><img src="/media/logo.png" alt="logo" class="logo"></a> </h2>
       </div>
+
       <div class="container">
   <h1 class="Title">Sign in</h1>
   <form method="POST" action="">
@@ -64,7 +65,12 @@ body{
 }
 .name{
   text-align:center;
-  color:white;
+  margin-left:auto;
+  margin-right:auto;
+
+}
+.logo{
+  width:3em;
 }
 .title-container{
   background-color:black;

@@ -9,7 +9,7 @@
     <div class="col-md-6 mt-md-0 mt-3 pt-1">
       <!-- Content -->
       <h3 class="text-light lead">Information</h3>
-      <p class="blockquote text-center">A banking Application which uses homomorphic encryption</p>
+      <p class="blockquote text-center">A banking application that uses homomorphic encryption. This application was made for the purpose showcasing the potential use case of homomorphic encryption</p>
     </div>
 
     <hr class="clearfix w-100 d-md-none pb-2">
@@ -17,16 +17,22 @@
       <h3 class="lead">Navigations</h3>
       <ul class="list-unstyled">
         <li>
+            <div class="nav-link"><router-link to="/setting">Settings</router-link></div>
+        </li>
+        <li>
             <div class="nav-link"><router-link to="/">Account Information</router-link></div>
         </li>
         <li>
-            <div class="nav-link"><router-link to="/">Logout</router-link></div>
+            <div class="nav-link"><router-link to="/transaction-history">Transaction History</router-link></div>
         </li>
         <li>
-            <div class="nav-link"><router-link to="/">Logout</router-link></div>        
+            <div class="nav-link"><router-link to="/savings">Saving Planner</router-link></div>        
         </li>
         <li>
-            <div class="nav-link"><router-link to="/">Logout</router-link></div>        
+            <div class="nav-link"><router-link to="/transfer">Transfer Money</router-link></div>        
+        </li>
+        <li>
+            <div class="nav-link"><router-link to="/transfer">Transfer Money</router-link></div>        
         </li>
       </ul>
 
@@ -57,7 +63,7 @@
 
 <!-- Copyright -->
 <div class="footer-copyright text-center py-3 bg-dark text-light">© 2023 Copyright:
-  <a class="link" href="/"> XXX.com</a>
+  <a class="link" href="/"> Ritik Desai</a>
 </div>
 <!-- Copyright -->
 

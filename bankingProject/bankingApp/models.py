@@ -22,6 +22,7 @@ class User(AbstractUser):
             'username': self.username,
             'fname' : self.first_name,
             'sname': self.last_name,
+            'email':self.email,
         }
 
 
@@ -54,3 +55,18 @@ class Transaction(models.Model):
             'date':self.date,
             'type':self.type
         }
+    
+class Support(models.Model):
+    account = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
+    description=models.TextField(blank=False)
+    date=models.DateTimeField(blank=False, null=False, default=None)
+    subject=models.TextField(blank=False)
+
+    def to_dict(self):
+            """Returns a dictionary of support tickets contents"""
+            return {                
+                'description':self.description,
+                'account' : self.account.to_dict(),
+                'date':self.date,
+                'subject':self.subject,
+            }
