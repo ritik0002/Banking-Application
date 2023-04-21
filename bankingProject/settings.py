@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9@t*w!qm+%ow^=xdt1vbwhusjozz*mxl!sre*gs&@tb^v!vw*r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 AUTH_USER_MODEL = 'bankingApp.User'
 
 CORS_ALLOWED_ORIGINS=[
