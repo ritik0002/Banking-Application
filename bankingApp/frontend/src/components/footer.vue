@@ -32,7 +32,7 @@
             <div class="nav-link"><router-link to="/transfer">Transfer Money</router-link></div>        
         </li>
         <li>
-            <div class="nav-link"><router-link to="/transfer">Transfer Money</router-link></div>        
+            <div class="nav-link"><router-link to="/budget">Budget</router-link></div>        
         </li>
       </ul>
 

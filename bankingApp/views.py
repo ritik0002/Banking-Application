@@ -104,7 +104,7 @@ def Calculator(request):
 
 
     if data['check']=="no":
-        if data['balance']>=data['goal']:
+        if float(data['balance'])>=float(data['goal']):
             return JsonResponse({
                 'response':"Balance is greater or already equal to the saving goal",
 
