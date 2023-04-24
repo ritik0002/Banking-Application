@@ -318,6 +318,7 @@ def home(request):
 
 
 def login_view(request):
+    error=""
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')    
@@ -328,7 +329,10 @@ def login_view(request):
             login(request, user)
             response = redirect('http://127.0.0.1:5173/')          
             return response
-    return render(request, 'login.html')
+        else:
+            error="invalid username or password"
+    context={'error':error}
+    return render(request, 'login.html',context)
     
 
 

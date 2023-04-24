@@ -18,11 +18,14 @@
         <h4>Password</h4>
         <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password"></div>
         <button class="btn btn-primary btn-dark" type="submit">Login</button>
+        {% if error %}
+          <p>{{ error }}</p>
+        {% endif %}
     </div>
   </form>
   <div class="register">
     <hr> 
-    <div class="font-weight-normal text-dark">
+    <div class="font-weight-bold text-dark">
         Don't have an account? <a href="{% url 'register' %}" class="">Sign Up</a>
     </div>
 </div>
@@ -76,5 +79,8 @@ body{
   background-color:black;
   padding:1%;
   border-radius:3%;
+}
+p{
+  color:red;
 }
 </style>
