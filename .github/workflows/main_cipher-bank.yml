@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'cipher-bank'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5D3C4C540D114BCCAB25003C2C051AF5 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_04E3251D85D24D49A949D9D639B12AF4 }}
