@@ -10,6 +10,7 @@ from Pyfhel import Pyfhel
 import pickle
 import math
 from datetime import datetime
+from django.core.exceptions import ValidationError
 
 def sessionUser(request):
     """checks to see if user is logged in"""
@@ -212,6 +213,8 @@ def transaction_api(request,userID):
     elif request.method == 'POST':
         # gets the json data from the frontend
         data = json.loads(request.body)
+        if float(data['amount'])<0:
+            raise ValidationError('Amount cannot be negative')
         # Creates new object and adds it to the existing object
         userId = userID
         val=int(float(data['amount'])*100)  #Multiply by 100 as im using BFV scheme
@@ -272,7 +275,9 @@ def transaction_api(request,userID):
             
         )
         return JsonResponse({
-            'transaction':[Transaction.objects.filter(type=data['type'])]
+            # 'transaction':[(Transaction.objects.filter(type=data['type']))]
+            't': [t.to_dict() for t in Transaction.objects.filter(type=data.get('type', ''))]
+
             })
 
 
