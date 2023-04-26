@@ -43,16 +43,10 @@
       <h3 class="lead">Follow us</h3>
       <ul class="list-unstyled">
         <li>
-          <a href=""><i class="bi bi-facebook"></i></a>
+          <a href="https://github.com/ritik0002"><i class="bi bi-github"></i></a>
         </li>
         <li>
-          <a href=""><i class="bi bi-instagram"></i></a>
-        </li>
-        <li>
-          <a href=""><i class="bi bi-linkedin"></i></a>
-        </li>
-        <li>
-          <a href=""><i class="bi bi-youtube"></i></a>
+          <a href="https://www.linkedin.com/in/ritik-desai-344191196/"><i class="bi bi-linkedin"></i></a>
         </li>
       </ul>
 
