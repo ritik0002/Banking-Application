@@ -82,12 +82,10 @@ class Account(TestCase):
         User = get_user_model()
         self.user = User.objects.create_user(
             username="testuser", password="testpass", balance=b"")
+        self.user2 = User.objects.create_user(
+            username="testuser2", password="testpass", balance=b"")
 
-    def test_withdraw_success(self):
-        response = self.client.post("/login/", data={
-            "username": "testuser",
-            "password": "testpass"
-        })
+    def test_deposit_success(self):
     #    response = self.client.post(reverse('transaction_api',kwargs={'userID': 1}), data={'amount': 0, 'type': 'w','desc':"",'date':})
         # Get the current date and time
         date_obj = datetime.now()
@@ -97,7 +95,7 @@ class Account(TestCase):
         date_string = date_string.replace('T', ' ')
     #    response = self.client.post(reverse('transaction_api', kwargs={'userID': 1}),json={'amount': 12.50, 'type':'D','desc':'','date':date_string},content_type='application/json')
         response = self.client.post(reverse('transaction_api', kwargs={
-                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 0, 'type': 'D', 'date': date_string}))
+                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 10, 'type': 'D', 'date': date_string}))
         HE = Pyfhel()  # Create a Pyfhel object
         # Load context from file
         HE.load_context(
@@ -114,13 +112,9 @@ class Account(TestCase):
         self.user.refresh_from_db()
         val = pickle.loads(self.user.balance)
         val = (HE.decryptInt(val)/100)[0]
-        self.assertEqual(val, 0)
+        self.assertEqual(val, 10)
 
-    def test_withdraw_fail(self):
-        response = self.client.post("/login/", data={
-            "username": "testuser",
-            "password": "testpass"
-        })
+    def test_deposit_fail(self):
         # Get the current date and time
         with self.assertRaisesMessage(ValidationError, 'Amount cannot be negative'):
 
@@ -131,14 +125,185 @@ class Account(TestCase):
             date_string = date_string.replace('T', ' ')
             response = self.client.post(reverse('transaction_api', kwargs={
                                         'userID': 1}), content_type='application/json', data=json.dumps({'amount': "-10", 'type': 'D', 'date': date_string}))
+
+        # Check if the account balance is updated correctly
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.balance, b"")
+
+    def test_withdraw_success(self):
+        # Get the current date and time
+        date_obj = datetime.now()
+        # Get a string representation in ISO 8601 format
+        date_string = date_obj.isoformat()
+        # Replace the 'T' character with a space
+        date_string = date_string.replace('T', ' ')
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 10, 'type': 'D', 'date': date_string}))
+    #    response = self.client.post(reverse('transaction_api', kwargs={'userID': 1}),json={'amount': 12.50, 'type':'D','desc':'','date':date_string},content_type='application/json')
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 5, 'type': 'W', 'date': date_string}))
+        HE = Pyfhel()  # Create a Pyfhel object
+        # Load context from file
+        HE.load_context(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/context")
+        # Load context from file
+        HE.load_public_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/public.key")
+        # Load context from file
+        HE.load_secret_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/secret.key")
+
+        self.assertEqual(response.status_code, 200)
+        # Check if the account balance is updated correctly
+        self.user.refresh_from_db()
+        val = pickle.loads(self.user.balance)
+        val = (HE.decryptInt(val)/100)[0]
+        self.assertEqual(val,5)
+
+
+    def test_withdraw_fail(self):
+        # Get the current date and time
+        with self.assertRaisesMessage(ValidationError, 'Amount cannot be negative'):
+
+            date_obj = datetime.now()
+            # Get a string representation in ISO 8601 format
+            date_string = date_obj.isoformat()
+            # Replace the 'T' character with a space
+            date_string = date_string.replace('T', ' ')
+            response = self.client.post(reverse('transaction_api', kwargs={
+                                        'userID': 1}), content_type='application/json', data=json.dumps({'amount': "-10", 'type': 'W', 'date': date_string}))
        
         # Check if the account balance is updated correctly
         self.user.refresh_from_db()
-
         self.assertEqual(self.user.balance,b"")
 
-    def test_deposit(self):
-        pass
+    def test_transfer_success(self):
+        date_obj = datetime.now()
+        # Get a string representation in ISO 8601 format
+        date_string = date_obj.isoformat()
+        # Replace the 'T' character with a space
+        date_string = date_string.replace('T', ' ')
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 100, 'type': 'D', 'date': date_string}))
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                    'userID': 2}), content_type='application/json', data=json.dumps({'amount': 50, 'type': 'D', 'date': date_string}))
+    #    response = self.client.post(reverse('transaction_api', kwargs={'userID': 1}),json={'amount': 12.50, 'type':'D','desc':'','date':date_string},content_type='application/json')
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                    'userID': 1}), content_type='application/json', data=json.dumps({'amount': 5, 'type': 'T','desc':'','date': date_string,'username':'testuser2'}))
+        HE = Pyfhel()  # Create a Pyfhel object
+        # Load context from file
+        HE.load_context(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/context")
+        # Load context from file
+        HE.load_public_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/public.key")
+        # Load context from file
+        HE.load_secret_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/secret.key")
 
-    def test_transfer(self):
-        pass
+        self.assertEqual(response.status_code, 200)
+        # Check if the account balance is updated correctly
+        self.user.refresh_from_db()
+        self.user2.refresh_from_db()
+        val = pickle.loads(self.user.balance)
+        val = (HE.decryptInt(val)/100)[0]
+        #check user balance
+        self.assertEqual(val,95)
+        #check user2 balance
+        val2 = pickle.loads(self.user2.balance)
+        val2 = (HE.decryptInt(val2)/100)[0]
+        self.assertEqual(val2,55)
+
+    def test_transfer_fail(self):
+                # Get the current date and time
+        with self.assertRaisesMessage(ValidationError, 'Amount cannot be negative'):
+
+            date_obj = datetime.now()
+            # Get a string representation in ISO 8601 format
+            date_string = date_obj.isoformat()
+            # Replace the 'T' character with a space
+            date_string = date_string.replace('T', ' ')
+            response = self.client.post(reverse('transaction_api', kwargs={
+                                        'userID': 1}), content_type='application/json', data=json.dumps({'amount': "120", 'type': 'D', 'date': date_string }))
+            response = self.client.post(reverse('transaction_api', kwargs={
+                                        'userID': 2}), content_type='application/json', data=json.dumps({'amount': "100", 'type': 'D', 'date': date_string }))
+            response = self.client.post(reverse('transaction_api', kwargs={
+                                        'userID': 2}), content_type='application/json', data=json.dumps({'amount': "-10", 'type': 'T', 'date': date_string ,"username":"testuser2"}))
+       
+        HE = Pyfhel()  # Create a Pyfhel object
+        # Load context from file
+        HE.load_context(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/context")
+        # Load context from file
+        HE.load_public_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/public.key")
+        # Load context from file
+        HE.load_secret_key(
+            "C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/secret.key")
+        # Check if the account balance is updated correctly
+        self.user.refresh_from_db()
+        self.user2.refresh_from_db()
+        val = pickle.loads(self.user.balance)
+        val = (HE.decryptInt(val)/100)[0]
+        #check user balance
+        self.assertEqual(val,120)
+        #check user2 balance
+        val2 = pickle.loads(self.user2.balance)
+        val2 = (HE.decryptInt(val2)/100)[0]
+        self.assertEqual(val2,100)
+
+    #using given balance
+    def test_saving_balance(self):
+        response = self.client.post(reverse('Calculator'), content_type='application/json', data=json.dumps({'check':"no",'goal':1000,'amount':10,'balance':120, }))
+        self.assertEqual(response.status_code, 200)
+
+    
+    #using current balance
+    def test_saving_currentbalance(self):
+            #log in
+        response = self.client.post("/login/", data={
+            "username": "testuser",
+            "password": "testpass"
+        })
+        date_obj = datetime.now()
+            # Get a string representation in ISO 8601 format
+        date_string = date_obj.isoformat()
+            # Replace the 'T' character with a space
+        date_string = date_string.replace('T', ' ')
+        response = self.client.post(reverse('transaction_api', kwargs={
+                                        'userID': 1}), content_type='application/json', data=json.dumps({'amount': "120", 'type': 'D', 'date': date_string }))
+        
+        response = self.client.post(reverse('Calculator'), content_type='application/json', data=json.dumps({'check':"yes",'goal':1000,'amount':10}))
+        self.assertEqual(response.status_code, 200)
+
+    #invalid input
+    def test_saving_fail(self):
+        with self.assertRaisesMessage(ValidationError, 'values cannot be negative'):
+            response = self.client.post(reverse('Calculator'), content_type='application/json', data=json.dumps({'check':"no",'goal':1000,'amount':10,'balance':-400}))
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(reverse('Calculator'), content_type='application/json', data=json.dumps({'check':"no",'goal':10000,'amount':-10,'balance':400}))
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(reverse('Calculator'), content_type='application/json', data=json.dumps({'check':"no",'goal':-1000,'amount':10,'balance':400}))
+            self.assertEqual(response.status_code, 200)
+
+
+    def test_support_success(self):
+                    #log in
+        response = self.client.post("/login/", data={
+            "username": "testuser",
+            "password": "testpass"
+        })
+        response = self.client.post(reverse('support'), content_type='application/json', data=json.dumps({'subject':"test",'description':"testing",'username':'testuser'}))
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_support_fail(self):
+                    #log in
+        response = self.client.post("/login/", data={
+            "username": "testuser",
+            "password": "testpass"
+        })
+        with self.assertRaisesMessage(ValidationError, 'value cannot be empty'):
+            response = self.client.post(reverse('support'), content_type='application/json', data=json.dumps({'subject':"",'description':"",'username':"testuser"}))
+            # self.assertContains(response, "This field is required.")
+        self.assertEqual(response.status_code, 302)

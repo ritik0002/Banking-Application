@@ -42,9 +42,9 @@
                 <h1>Contact Support</h1>
                 <form @submit.prevent="sendSupport">
                     <h3>Subject</h3>
-                    <input class="textfield" type="text" v-model="subject">
+                    <input class="textfield" type="text" v-model="subject" required>
                     <h3>Description</h3>
-                    <textarea class="textfield" rows="4" v-model="description"></textarea>
+                    <textarea class="textfield" rows="4" v-model="description" required></textarea>
                     <div>
                         <button class="b2 btn btn-info" type="submit">Contact Support</button>
 
@@ -137,9 +137,9 @@ export default {
         },
         async sendSupport() {
             const password = JSON.stringify({
-                username: this.username, //saving goal
-                subject: this.subject,     //saving per month
-                description: this.description,  //entered balance
+                username: this.username, 
+                subject: this.subject,    
+                description: this.description,  
             })
             let response = await fetch("http://127.0.0.1:8000/api/support/", {
                 method: 'POST',

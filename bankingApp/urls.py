@@ -17,7 +17,7 @@ urlpatterns = [
     path('api/password/',views.password),
     
     #support ticket
-    path('api/support/',views.support),
+    path('api/support/',views.support,name="support"),
     #Calculator
     path('api/Calculator/', views.Calculator,name="Calculator"),
     

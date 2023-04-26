@@ -100,11 +100,15 @@ def decrypt_data(val):
 def Calculator(request):
     """Handles saving Calculator """
     data=json.loads(request.body)
+    if float(data['amount'])<0 or float(data['goal']<0):
+            raise ValidationError('values cannot be negative')
     #use given balance
     result=0
 
 
     if data['check']=="no":
+        if float(data['balance'])<0 :
+            raise ValidationError('values cannot be negative')
         if float(data['balance'])>=float(data['goal']):
             return JsonResponse({
                 'response':"Balance is greater or already equal to the saving goal",
@@ -304,6 +308,8 @@ def support(request):
         })
     if request.method == 'POST':
         data = json.loads(request.body)
+        if (data['subject'])=='' or data['description']=='':
+            raise ValidationError('value cannot be empty')
         ticket=Support.objects.create(
             subject=data['subject'],
             description=data['description'],
@@ -311,8 +317,13 @@ def support(request):
             date=datetime.now(),
         )
         return JsonResponse({
-            'Ticket':ticket
+            'subject':data['subject'],
+            'description':data['description'],
+            'account':get_object_or_404(User,username=data['username']).to_dict(),
+            'date':datetime.now()
             })
+
+
 
 
 
