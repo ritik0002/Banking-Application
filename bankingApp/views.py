@@ -141,6 +141,7 @@ def Calculator(request):
             amount=float(data['goal'])-balance
             result=amount/float(data['amount'])
             result=math.ceil(result)  #round up   
+            result=round(result,2)
             return JsonResponse({
                 'response':f"To achieve £{amount} it will take {result} months",
 
