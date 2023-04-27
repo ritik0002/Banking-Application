@@ -27,7 +27,7 @@
                            <ul> <li v-for="(item, index) in amounts"> {{ index }} &#41; {{ item.name }}: £{{ item.amount }}</li> </ul>
                     </div>
                     <hr>
-                    <div class="total">Total Expenses:£ {{ total }}</div>
+                    <div class="total">Total Expenses:£ {{ total.toFixed(2) }}</div>
 
                 </div>
             </div>

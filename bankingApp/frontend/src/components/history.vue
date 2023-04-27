@@ -22,6 +22,7 @@
                     </tr>
                 </thead>
                 <tbody>
+               
                     <tr v-for="(x, index) in Transactions" :key="index">
                         <!-- Template element doesn't effect the HTML elements (so table contents stay) -->
                         <template v-if="type[x.type].includes(searchQuery.toLowerCase())===true || searchQuery===''">
@@ -40,7 +41,10 @@
                         </td>
                         <td>{{ x.description }}</td>
                         <td>{{ x.amount }}</td>
-                        <td ><button ref="buttonT"  @click="fetch_current_transaction(x.id,index)">Get Amount</button></td>
+                       
+                        <td ><button ref="buttonT" :id="'button-' + x.id"  @click="fetch_current_transaction(x.id,index)">Get Amount</button></td>
+              
+
                     </template>
                     </tr>
                 </tbody>
@@ -71,6 +75,7 @@ export default {
 
     data() {
         return {
+            count:0,
             searchQuery:"",
             Transactions: null,
             Transaction:null,
@@ -99,13 +104,19 @@ export default {
             this.Transaction = data.Transaction.amount;
             console.log("yes", this.Transaction);
             // this.Transactions[index]=this.Transaction;
-            this.$refs.buttonT[index].innerHTML = this.Transaction
-            this.$refs.buttonT[index].style.border = "none";
-            this.$refs.buttonT[index].style.background = "none";
-            this.$refs.buttonT[index].style.cursor = "default";
-            this.$refs.buttonT[index].disabled = true;
-            this.$refs.buttonT[index].style.color="black";
-            this.$refs.buttonT[index].style.fontWeight="bold";
+            // index=index-this.count
+            // console.log(this.count)
+            const button = document.getElementById('button-' + id);
+
+            button.innerHTML = this.Transaction
+            button.style.border = "none";
+            button.style.background = "none";
+            button.style.cursor = "default";
+            button.disabled = true;
+            button.style.color="black";
+            button.fontWeight="bold";
+
+           
         },
 
 
