@@ -13,9 +13,9 @@
             <form class="pass" @submit.prevent="changePassword">
                 <h2>Change Password</h2>
                 <h4>Enter current password:</h4>
-                <input type="password" v-model="oPassword">
+                <input type="password" v-model="oPassword" required>
                 <h4>Enter new password:</h4>
-                <input type="password" v-model="nPassword">
+                <input type="password" v-model="nPassword" required>
                 <div>
                     <button class="b4 btn btn-info" type="submit">Submit</button>
 
@@ -134,6 +134,8 @@ export default {
             })
             this.message = await response.json()
             this.message = this.message.response
+            this.oPassword=""
+            this.nPassword=""
         },
         async sendSupport() {
             const password = JSON.stringify({
@@ -153,6 +155,8 @@ export default {
             })
             this.message = await response.json()
             this.message = this.message.response
+            this.subject=""
+            this.description=""
         },
 
         async getSuperUser() {

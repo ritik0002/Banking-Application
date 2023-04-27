@@ -100,7 +100,7 @@ def decrypt_data(val):
 def Calculator(request):
     """Handles saving Calculator """
     data=json.loads(request.body)
-    if float(data['amount'])<0 or float(data['goal']<0):
+    if float(data['amount'])<0 or float(data['goal'])<0:
             raise ValidationError('values cannot be negative')
     #use given balance
     result=0

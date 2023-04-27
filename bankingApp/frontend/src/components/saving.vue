@@ -98,6 +98,9 @@ export default {
                     },
                     body: Calculate,
                 })
+            this.goal=null
+            this.bal=null
+            this.amountM=null
             this.result=await response.json()
             this.result=this.result.response
             console.log(this.result)

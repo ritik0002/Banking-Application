@@ -172,6 +172,7 @@ export default {
                 })
                 this.fetch_Transactions();
                 this.fetch_Balance();
+                this.inputData2=""
 
             }
 
@@ -202,6 +203,7 @@ export default {
                 },
                 body: Transaction,
             })
+            this.inputData=""
             this.fetch_Transactions();
             this.fetch_Balance();
 

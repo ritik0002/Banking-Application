@@ -124,6 +124,10 @@ export default {
                     body: Transaction,
                 })
                 this.fetch_Balance();
+                this.desc=""
+                this.username="",
+                this.amount=null
+
             }
         },
         async fetch_Balance() {
