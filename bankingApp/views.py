@@ -264,11 +264,15 @@ def transaction_api(request,userID):
             user.save()
             #deposit sender account
             sender=get_object_or_404(User,username=data['username'])
-            temp2=sender.balance
-            bal2=pickle.loads(temp2)
-            bal2+=encrypted_data
-            sender.balance=pickle.dumps(bal2)
-            sender.save()
+            if len(sender.balance)==0:
+                sender.balance=pickle.dumps(encrypted_data)
+                sender.save()
+            else:
+                temp2=sender.balance
+                bal2=pickle.loads(temp2)
+                bal2+=encrypted_data
+                sender.balance=pickle.dumps(bal2)
+                sender.save()
           #create transfer object to sender
             transaction=Transaction.objects.create(
             type=data['type'],
