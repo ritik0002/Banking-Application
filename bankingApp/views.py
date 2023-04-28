@@ -327,6 +327,14 @@ def support(request):
             'account':get_object_or_404(User,username=data['username']).to_dict(),
             'date':datetime.now()
             })
+    if request.method == 'DELETE':
+        data=json.loads(request.body)
+        
+        ticket = get_object_or_404(Support, id=data)
+        ticket.delete()
+        return JsonResponse({
+            'response':"support ticket deleted!",
+        })
 
 
 

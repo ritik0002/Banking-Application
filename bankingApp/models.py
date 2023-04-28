@@ -69,4 +69,5 @@ class Support(models.Model):
                 'account' : self.account.to_dict(),
                 'date':self.date,
                 'subject':self.subject,
+                'id':self.id,
             }

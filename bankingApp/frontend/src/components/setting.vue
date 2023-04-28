@@ -54,13 +54,14 @@
         </section>
         <section v-if="user == true">
             <h1>User Queries</h1>
-            <div class="container-3">
-                <div v-for="t in tickets" class="container-s">
+            <div class="container-3 ">
+                <div class="container-s" v-for="t in tickets" :key="t.id" >
                     <div>username:{{ t.account.username }} 
                         email:{{ t.account.email }}    
                         <h1>{{ t.subject }}</h1>
                     </div> 
                     <div>{{ t.description }}</div>
+                    <button class="b2 btn btn-info bold" @click="deleteTicket(t)" type="submit">Delete query</button>
                     
 
                 </div>
@@ -204,6 +205,19 @@ export default {
             })
             this.message2 = await response.json()
             this.message2 = this.message2.response
+        },
+        async deleteTicket(t){
+            let response = await fetch("http://127.0.0.1:8000/api/support/", {
+                method: 'DELETE',
+                credentials: "include",
+                mode: "cors",
+                referrerPolicy: "no-referrer",
+                headers: {
+                    'X-CSRFToken': getCookie("csrftoken"),
+                },
+                body:t.id,
+            })
+            this.getTickets();
         }
 
     },
@@ -281,7 +295,8 @@ section{
     margin-bottom: 5%;
     flex-direction: column;
     padding:2%;
-    background-color: rgb(232, 232, 232);
+    color:white;
+    background-color: rgb(6, 6, 6);
 }
 
 .del{
@@ -296,5 +311,14 @@ section{
 
 input[type='password']{
     width:80%;
+}
+
+.color{
+    background-color: rgb(250, 219, 219);
+}
+
+.bold{
+    font-weight: bold !important;
+    color:rgb(255, 255, 255);
 }
 </style>

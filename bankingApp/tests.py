@@ -67,9 +67,9 @@ class Register(TestCase):
             "first_name": "test",
             "last_name": "tests",
             "username": "testuser",
-            "email": "test@example.com",  # invalid email format
+            "email": "test@example.com",  
             "password1": "Random3456",
-            "password2": "Random345"
+            "password2": "Random345"  #Password 1 doesn't match password 2
         })
         # Check that the response status code is 200
         self.assertEqual(response.status_code, 200)
