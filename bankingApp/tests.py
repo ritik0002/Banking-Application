@@ -41,6 +41,7 @@ class Login(TestCase):
 
 class Register(TestCase):
 
+
     def test_register_success(self):
         User = get_user_model()
         response = self.client.post(reverse("register"), data={
@@ -74,6 +75,9 @@ class Register(TestCase):
         # Check that the response status code is 200
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.wsgi_request.user.is_authenticated)
+          # Check that the user account was not created
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(username="testuser")
 
 
 class Account(TestCase):
