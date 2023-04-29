@@ -16,7 +16,7 @@
                         <h2>Deposit Money</h2>
                         <form @submit.prevent="saveDeposit">
                             <div class="input-group">
-                                <input type="Number" step="0.01" v-model="inputData"
+                                <input type="Number" step="0.01" min="1" max="10000"  v-model="inputData"
                                     class="form-control border border-dark" />
                                 <button class="btn-color" type="submit">Submit</button>
                             </div>
@@ -26,11 +26,13 @@
                         <h2>Withdraw Money</h2>
                         <form @submit.prevent="saveWithdraw">
                             <div class="input-group">
-                                <input type="Number" step="0.01" v-model="inputData2"
+                                <input type="Number" step="0.01" min="1" max="10000"  v-model="inputData2"
                                     class="form-control border border-dark" />
                                 <button class="btn-color" type="submit">Submit</button>
-                                <p id="errorMessage"></p>
+                    
                             </div>
+                            <p id="errorMessage"></p>
+
                         </form>
                     </div>
                 </div>
@@ -297,5 +299,8 @@ export default {
 
 }
 
+#errorMessage{
+    color:red;
+}
 
 </style>

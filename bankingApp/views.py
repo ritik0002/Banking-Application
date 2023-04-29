@@ -118,7 +118,7 @@ def Calculator(request):
         amount=float(data['goal'])-float(data['balance'])
         result=amount/float(data['amount'])
         result=math.ceil(result)  #round up
-        
+        result=round(result,2)
         return JsonResponse({
             'response':f"To achieve £{amount} it will take {result} months",
 
@@ -195,6 +195,7 @@ def transaction_api(request,userID):
     HE.load_context("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/context") # Load context from file
     HE.load_public_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/public.key") # Load context from file
     HE.load_secret_key("C:/Users/ritik/OneDrive/Documents/University Computer Science/Year 3/Project/Project Code/bankingApp/secret.key") # Load context from file
+
     # HE.load_public_key("public.key") # Load public key from file
     # HE.load_secret_key("secret.key") # Load secret key from file
     if request.method == 'GET':
@@ -214,12 +215,12 @@ def transaction_api(request,userID):
                 for Transaction in (Transaction.objects.filter(account__id=userID).order_by('-date'))
             ]
         })
-#Withdraw Or Deposit
+#Withdraw Or Deposit or Transfer
     elif request.method == 'POST':
         # gets the json data from the frontend
         data = json.loads(request.body)
-        if float(data['amount'])<0:
-            raise ValidationError('Amount cannot be negative')
+        if float(data['amount'])<0 or float(data['amount'])>10000:
+            raise ValidationError('Amount cannot be negative or amount cannot be greater than 100000')
         # Creates new object and adds it to the existing object
         userId = userID
         val=int(float(data['amount'])*100)  #Multiply by 100 as im using BFV scheme

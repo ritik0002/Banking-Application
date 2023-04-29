@@ -13,11 +13,11 @@
                 <hr>
                  <form @submit.prevent="sendTransfer">
                     Transfer to:
-                    <input class="form-control" type="text" placeholder="Enter Username" v-model="username">
+                    <input class="form-control" type="text" placeholder="Enter Username" v-model="username" required>
                     Description:
-                    <input class="form-control" type="text" placeholder="Default input" v-model="desc">
+                    <input class="form-control" type="text" placeholder="Default input" v-model="desc" >
                     Amount:
-                    <input class="form-control" type="Number" step="0.01" placeholder="enter a number" v-model="amount">
+                    <input class="form-control" type="Number" step="0.01" min="1" max="10000"  placeholder="enter a number" v-model="amount" required>
                     <button class="sub btn btn-dark" type="submit">Submit</button>
                     <p id="errorMessage"></p>
                 </form>
@@ -32,6 +32,7 @@
             </div>
         </div>
     </div>
+    
 </template>
 
 <script>
@@ -61,6 +62,7 @@ export default {
         username:"",
         amount:null,
         desc:"",
+        currentuser:"",
 
 
         }
@@ -97,7 +99,11 @@ export default {
             this.users=data2.user
             this.id = data1.User.id   //gets current user id
             let result=this.users.some(x=>x.username===this.username)
-            if(result==false){
+            if(this.username.toLowerCase() === data1.User.username.toLowerCase()){
+                document.getElementById("errorMessage").innerHTML = "Error cannot be current username!"
+
+            }
+            else if(result==false){
                 document.getElementById("errorMessage").innerHTML = "Error invalid username!"
             }
             else if (parseFloat(this.balance) < (parseFloat(parseFloat(this.inputData2).toFixed(2)))) {
@@ -188,5 +194,9 @@ export default {
 .container{
     margin-top:2%;
 
+}
+
+#errorMessage{
+    color:red;
 }
 </style>
